@@ -1,0 +1,79 @@
+
+@startuml Sekvensdiagram_V3
+title US 30 - Personal söker efter bokning (Version 3)
+
+actor Personal
+boundary "UI" as UI
+control "BookingService" as Service
+participant "IBookingRepository" as Repository
+
+Personal -> UI : Öppna sökfunktionen
+UI --> Personal : Visa gemensamt sökfält
+
+loop Medan personalen vill fortsätta söka
+
+    Personal -> UI : Ange bokningsnummer eller e-postadress
+    Personal -> UI : Klicka på Sök
+
+    alt Sökfältet är tomt
+
+        UI --> Personal : Visa "Ange ett bokningsnummer eller en e-postadress"
+
+    else Sökfältet är ifyllt
+
+        UI -> UI : Kontrollera sökuppgiftens format
+
+        alt Ogiltigt format
+
+            UI --> Personal : Visa "Ogiltigt bokningsnummer eller e-postadress"
+
+        else Giltigt format
+
+            UI -> Service : SearchBookings(searchText)
+            activate Service
+
+            alt Giltigt GUID-format
+
+                Service -> Service : GetBookingByNumber(searchText)
+
+                Service -> Repository : GetByBookingNumber(searchText)
+                activate Repository
+                Repository --> Service : Booking eller null
+                deactivate Repository
+
+                note right of Service
+                    En hittad Booking läggs i en lista.
+                    Null ger en tom lista.
+                end note
+
+            else Giltigt e-postformat
+
+                Service -> Service : GetBookingsByCustomerEmail(searchText)
+
+                Service -> Repository : GetByCustomerEmail(searchText)
+                activate Repository
+                Repository --> Service : List<Booking>
+                deactivate Repository
+
+            end
+
+            Service --> UI : List<Booking>
+            deactivate Service
+
+            alt Matchande bokningar finns
+
+                UI --> Personal : Visa matchande bokningar
+
+            else Inga matchande bokningar
+
+                UI --> Personal : Visa "Ingen bokning hittades"
+
+            end
+
+        end
+
+    end
+
+end
+
+@enduml

@@ -1,0 +1,43 @@
+
+@startuml Sekvensdiagram_V2
+title US 30 - Personal söker efter bokning (Version 2)
+
+actor Personal
+boundary "UI" as UI
+control "BookingService" as Service
+entity "IBookingRepository" as Repository
+
+Personal -> UI : Välj sökmetod och ange sökuppgift
+Personal -> UI : Klicka på Sök
+activate UI
+
+alt Sökning med bokningsnummer
+    UI -> Service : GetBookingByNumber(bokningsnummer)
+    activate Service
+    Service -> Repository : Hämta bokning med bokningsnummer
+    activate Repository
+    Repository --> Service : Booking eller null
+    deactivate Repository
+    Service --> UI : Booking eller null
+    deactivate Service
+
+else Sökning med e-postadress
+    UI -> Service : GetBookingsByCustomerEmail(e-postadress)
+    activate Service
+    Service -> Repository : Hämta bokningar med e-postadress
+    activate Repository
+    Repository --> Service : Lista med bokningar
+    deactivate Repository
+    Service --> UI : Lista med bokningar
+    deactivate Service
+end
+
+alt Matchande bokningar finns
+    UI --> Personal : Visa matchande bokningar
+else Inga matchande bokningar
+    UI --> Personal : Visa "Ingen bokning hittades"
+end
+
+deactivate UI
+
+@enduml

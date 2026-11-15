@@ -1,0 +1,31 @@
+
+@startuml Aktivitetsdiagram_V1
+title US 30 - Personal söker efter bokning (Version 1)
+
+start
+
+:Personal öppnar sökfunktionen;
+
+:Välj sökmetod
+(bokningsnummer eller e-postadress);
+
+:Ange sökuppgift;
+
+:Klicka på Sök;
+
+if (Är sökfältet tomt?) then (Ja)
+  :Visa "Ange ett bokningsnummer
+  eller en e-postadress";
+else (Nej)
+  :Sök efter matchande bokningar;
+
+  if (Finns matchande bokningar?) then (Ja)
+    :Visa matchande bokningar;
+  else (Nej)
+    :Visa "Ingen bokning hittades";
+  endif
+
+endif
+
+stop
+@enduml
